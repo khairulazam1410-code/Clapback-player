@@ -1,164 +1,121 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pemain - Clapback</title>
-<style>
-    body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; text-align: center; padding: 15px; margin: 0; min-height: 100vh; }
-    h2 { margin: 10px 0 5px 0; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; }
-    p.subtitle { font-size: 0.9rem; color: #bdc3c7; margin-bottom: 20px; }
-    .hand-container { display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
-    .card-btn { background: white; color: #2c3e50; border: none; padding: 20px; border-radius: 15px; font-size: 0.95rem; font-weight: 600; text-align: left; cursor: pointer; border-left: 8px solid #3498db; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.1s; width: 100%; box-sizing: border-box; line-height: 1.5; opacity: 0; animation: slideIn 0.5s forwards; }
-    @keyframes slideIn { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(10px); } }
-    .card-btn:active { transform: scale(0.97); background: #ecf0f1; }
-    .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
-    .btn-refresh { background: #f1c40f; color: #2c3e50; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-    #error-msg { color: #e74c3c; display: none; margin-top: 20px; font-weight: bold; border: 1px solid white; padding: 10px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pemain - Clapback</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; text-align: center; padding: 15px; margin: 0; min-height: 100vh; }
+        h2 { margin: 10px 0 5px 0; color: #f1c40f; text-transform: uppercase; letter-spacing: 1px; }
+        p.subtitle { font-size: 0.9rem; color: #bdc3c7; margin-bottom: 20px; }
+        .hand-container { display: flex; flex-direction: column; gap: 15px; padding-bottom: 50px; }
+        .card-btn { background: white; color: #2c3e50; border: none; padding: 20px; border-radius: 15px; font-size: 0.95rem; font-weight: 600; text-align: left; cursor: pointer; border-left: 8px solid #3498db; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: transform 0.1s; width: 100%; box-sizing: border-box; line-height: 1.5; opacity: 0; animation: slideIn 0.5s forwards; }
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } from { opacity: 0; transform: translateY(10px); } }
+        .card-btn:active { transform: scale(0.97); background: #ecf0f1; }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(44, 62, 80, 0.98); z-index: 100; flex-direction: column; align-items: center; justify-content: center; }
+        .btn-refresh { background: #f1c40f; color: #2c3e50; padding: 12px 30px; border: none; border-radius: 50px; font-weight: bold; font-size: 1rem; margin-top: 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #error-msg { color: #e74c3c; display: none; margin-top: 20px; font-weight: bold; border: 1px solid white; padding: 10px; }
+    </style>
 </head>
 <body>
 
-<h2>Pilih Respon</h2>
-<p class="subtitle">Pilih 1 daripada <b>3 pilihan</b> di bawah.</p>
+    <h2>Pilih Respon</h2>
+    <p class="subtitle">Pilih 1 daripada <b>3 pilihan</b> di bawah.</p>
 
-<div class="hand-container" id="hand">
-    <div style="color: #95a5a6;">Mengocok kad...</div>
-</div>
+    <div class="hand-container" id="hand">
+        <div style="color: #95a5a6;">Mengocok kad...</div>
+    </div>
+    
+    <div id="error-msg"></div>
 
-<div id="error-msg"></div>
+    <div class="overlay" id="waitScreen">
+        <div style="font-size:4rem;">🚀</div>
+        <h3>Dihantar!</h3>
+        <p>Tengok skrin depan.</p>
+        <button class="btn-refresh" onclick="location.reload()">Dapat 3 Kad Baru</button>
+    </div>
 
-<div class="overlay" id="waitScreen">
-    <div style="font-size:4rem;">🚀</div>
-    <h3>Dihantar!</h3>
-    <p>Tengok skrin depan.</p>
-    <button class="btn-refresh" onclick="location.reload()">Dapat 3 Kad Baru</button>
-</div>
+    <script>
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyLCwOpRhHsN1mcSuyNLmTw-G2mG_GagtRzCR7VXT1N-xuHHwbWolRGQ1GTzsbBaFuc/exec';
 
-<script>
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbyLCwOpRhHsN1mcSuyNLmTw-G2mG_GagtRzCR7VXT1N-xuHHwbWolRGQ1GTzsbBaFuc/exec';
+        // === SENARAI PENUH KAD (Universal) ===
+        const allResponses = [
+            // TERAPEUTIK (Menang)
+            "Saya dengar keraguan awak tu, terima kasih sebab jujur dengan saya.",
+            "Boleh kita 'pause' sekejap? Saya rasa ada benda penting di sebalik ayat awak tu.",
+            "Saya perasan nada suara awak berubah bila cakap pasal ni.",
+            "Nampak macam awak rasa tak selamat dalam sesi ni sekarang.",
+            "Saya nak pastikan saya betul-betul faham maksud awak, boleh jelaskan lagi?",
+            "Ayat awak tu bagi kesan pada saya, nampak macam awak tengah kecewa.",
+            "Walaupun awak rasa begitu, saya masih kat sini nak cuba faham.",
+            "Mari kita tengok apa sebenarnya yang buat awak rasa macam tu.",
+            "Saya tak boleh janji atau setuju terus, tapi saya boleh dengar dulu.",
+            "Saya hargai pandangan awak, tapi peranan saya kat sini berbeza sikit.",
+            "Saya rasa ada jurang antara kita sekarang, jom kita baiki.",
+            "Ayat tu berat, boleh kita bincang kenapa awak rasa perlu cakap macam tu?",
+            "Saya tak nak lawan cakap awak, saya cuma nak faham perspektif awak.",
+            "Jom kita fokus pada apa yang berlaku dalam bilik ni sekarang.",
+            "Saya sedar awak mungkin rasa saya tak cukup bagus, dan itu okay untuk dibincangkan.",
 
-    const allResponses = [
-        "Rasanya kita kena tekan butang 'pause' sekejap dekat ayat tadi tu, ada benda penting kat situ.",
-        "Boleh tak kita slow down sikit? Saya nak pastikan saya betul-betul faham maksud di sebalik ayat awak tadi.",
-        "Ayat awak tu menarik perhatian saya... bunyi macam ada satu andaian besar yang awak letak kat situ.",
-        "Saya nak semak balik dengan awak, apa sebenarnya niat awak bila sebut ayat macam tu?",
-        "Walaupun mungkin awak tak sengaja, tapi ayat tu memberi kesan rasa macam penafian pada pengalaman saya.",
-        "Bila awak cakap macam tu, bahasa yang awak guna tu terasa agak menghakimi situasi ni.",
-        "Ayat tu bunyi macam awak tengah pukul rata (generalize) semua orang, padahal situasi awak ni unik.",
-        "Boleh tak kita alihkan fokus ni balik kepada pengalaman awak sendiri, bukan orang lain?",
-        "Saya kat sini memang nak bantu awak, tapi saya nak kita teruskan dengan bahasa yang lebih hormat.",
-        "Saya perasan nada awak berubah jadi lain sikit bila kita sentuh topik sensitif ni.",
-        "Cara awak cakap tu memberi kesan pada rasa keselamatan dalam sesi kita sekarang ni.",
-        "Saya tak boleh biar je awak cakap macam tu tanpa kita tengok balik apa kesan ayat tu.",
-        "Apa yang berlaku antara kita sekarang ni penting, nampak macam ada isu kepercayaan kat sini.",
-        "Saya ingin faham, adakah awak risau yang saya tak mampu faham situasi awak?",
-        "Mari kita kembali kepada tujuan asal sesi ni, kita tak nak tersasar ke arah personal.",
-        "Saya dengar apa awak cakap, tapi saya rasa perlu perjelaskan peranan saya kat sini.",
-        "Saya rasa tak selesa nak teruskan kalau nada perbualan kita kekal macam ni.",
-        "Saya tak boleh bersetuju dengan cara awak tu, tapi saya masih nak kekal dalam proses bantu awak.",
-        "Kita perlukan satu sempadan (boundary) yang jelas supaya sesi ni boleh berjalan dengan baik.",
-        "Saya hargai pandangan awak, tapi ayat tadi tu melintasi batas profesional saya.",
-        "Jap, kita pause kejap kat ayat tadi.",
-        "Bunyi macam ada assumption je kat situ.",
-        "Sorry, saya rasa kurang selesa bila awak cakap macam tu.",
-        "Boleh tak kita slow down sikit? Saya nak faham betul-betul.",
-        "Ayat tu rasa macam generalize semua orang pulak.",
-        "Walaupun niat awak gurau, tapi effect dia terasa sikit.",
-        "Kita fokus kat cerita you je, tak payah samakan dengan orang lain.",
-        "Saya kat sini nak tolong, tapi saya perlukan rasa hormat juga.",
-        "Saya perasan bila masuk topik ni, nada awak lain macam sikit.",
-        "Saya tak boleh biar je awak cakap macam tu tanpa kita check balik.",
-        "Ayat tu agak berat, boleh kita bincang kenapa awak cakap macam tu?",
-        "Saya dengar apa awak cakap, tapi cara penyampaian tu agak kasar.",
-        "Kita reset balik boleh? Saya nak pastikan kita dua-dua selesa.",
-        "Saya rasa itu pandangan peribadi, bukan fakta.",
-        "Saya faham awak marah, tapi kita kena jaga boundary dalam sesi ni.",
-        "Terima kasih sebab awak sudi berkongsi benda yang susah ni dengan saya hari ini.",
-        "Saya boleh dengar nada kekecewaan yang sangat mendalam dalam suara awak tu.",
-        "Nampak gayanya hari ini memang satu hari yang sangat berat dan melelahkan untuk awak.",
-        "Saya cuba menyelami perasaan awak, mesti perit kan bila rasa tak difahami.",
-        "Boleh awak cerita lebih lanjut lagi? Saya nak faham dengan lebih teliti.",
-        "Saya sangat hargai kejujuran awak meluahkan apa yang terbuku di hati selama ni.",
-        "Bunyinya macam awak sedang menahan rasa marah yang dah lama awak simpan.",
-        "Awak nampak sangat tertekan dengan semua yang berlaku ni, ambil masa awak.",
-        "Saya ada di sini untuk mendengar, awak tak perlu rasa keseorangan hadap benda ni.",
-        "Mari kita tarik nafas dalam-dalam dulu, tenangkan fikiran sebelum sambung.",
-        "Perasaan yang awak rasa tu valid, sesiapa pun kat tempat awak mungkin rasa benda sama.",
-        "Saya minta maaf kalau situasi ni buat awak rasa tak selesa atau terbeban.",
-        "Itu satu pengalaman yang sukar, tak mudah untuk sesiapa pun lalui semua tu.",
-        "Saya sedang cuba sebaik mungkin untuk melihat isu ini dari sudut pandang awak.",
-        "Teruskan saja, ruang ni selamat untuk awak luahkan apa saja yang awak rasa.",
-        "Saya nampak air muka awak berubah, mesti ada benda berat yang awak fikirkan.",
-        "Tak apa, menangis tu normal. Lepaskan je apa yang awak rasa nak lepaskan.",
-        "Saya kagum awak masih mampu bertahan sampai hari ni walaupun dugaannya hebat.",
-        "Kita ambil masa sikit untuk proses perasaan ni, tak perlu rushing ke mana-mana.",
-        "Saya faham, kadang-kadang bila kita dah penat sangat, kita cuma nak didengari.",
-        "Okay, I see...",
-        "Faham, sambunglah lagi.",
-        "Oh macam tu...",
-        "Terima kasih sebab jujur dengan saya.",
-        "Berat juga tu apa yang awak lalui.",
-        "Saya dengar...",
-        "Boleh tahan juga dugaan awak ni.",
-        "Ambil masa awak, tak perlu rushing.",
-        "Saya cuba faham situasi awak.",
-        "Teruskan, saya dengar ni.",
-        "Eh sekejap, mana ada saya macam tu! Awak jangan nak tuduh melulu.",
-        "Awak ingat saya ni siapa? Saya ada kelulusan Master tau, saya tahu kerja saya.",
-        "Kenapa awak cakap kasar sangat ni? Mak ayah awak tak ajar adab ke?",
-        "Awak tak patut cakap macam tu pada saya, saya ni kaunselor awak tau.",
-        "Itu bukan maksud sayalah! Awak ni suka sangat salah faham.",
-        "Saya cuma nak tolong awak je, tu pun awak nak marah-marah.",
-        "Awak ni memang terlalu sensitif la, benda kecil pun nak besarkan.",
-        "Janganlah emosi sangat, cuba bawa bertenang dan fikir logik sikit.",
-        "Saya tak buat apa-apa salah pun, awak yang beremosi lebih-lebih.",
-        "Kalau awak tak suka cara saya, pintu keluar ada kat sana, boleh balik.",
-        "Awak ni memang jenis susah nak dibantu kan? Patutlah masalah tak selesai.",
-        "Saya ni kaunselor profesional, awak tu klien, tolong hormat sikit.",
-        "Bukan salah saya kalau awak rasa macam tu, itu masalah awak sendiri.",
-        "Awak perlu hormat saya sebagai orang yang lagi berilmu dalam bidang ni.",
-        "Saya tak dibayar gaji untuk awak hina-hina saya macam ni tau.",
-        "Kenapa awak nak serang peribadi saya pulak? Kita bincang pasal awak kan.",
-        "Awak fikir awak siapa nak ajar saya cara buat kerja saya?",
-        "Saya dah buat yang terbaik untuk tolong, tapi awak yang tak bersyukur.",
-        "Itu pandangan awak je, orang lain semua okay je dengan saya.",
-        "Malaslah saya nak layan kalau perangai awak macam budak-budak ni."
-    ];
+            // EMPATI (Okay)
+            "Saya dengar awak rasa kecewa/marah.",
+            "Nampak gayanya benda ni sangat berat untuk awak.",
+            "Terima kasih sebab bagitahu saya apa awak rasa.",
+            "Saya faham, situasi ni memang susah.",
+            "Boleh awak sambung lagi? Saya tengah dengar.",
+            "Saya minta maaf kalau awak rasa macam tu.",
+            "Perasaan awak tu valid.",
+            "Ambil masa awak, tak perlu terburu-buru.",
+            "Saya nampak awak tengah struggle sekarang.",
+            "Kita cuba selesaikan sama-sama ya.",
 
-    function getRandomCards() {
-        const shuffled = [...allResponses].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 3);
-    }
+            // DEFENSIF (Kalah)
+            "Eh, awak jangan nak tuduh saya macam tu!",
+            "Saya kaunselor bertauliah tau, hormat sikit.",
+            "Kenapa awak degil sangat ni?",
+            "Kalau tak suka cara saya, boleh cari orang lain.",
+            "Saya tak buat salah pun, awak yang sensitif.",
+            "Jangan nak ajar saya buat kerja.",
+            "Awak ni memang susah nak dibantu la.",
+            "Saya dah buat yang terbaik, awak yang tak hargai.",
+            "Itu masalah awak, bukan masalah saya.",
+            "Malas la saya nak layan kalau macam ni."
+        ];
 
-    function renderHand() {
-        const container = document.getElementById('hand');
-        container.innerHTML = ''; 
-        const myCards = getRandomCards();
-        
-        myCards.forEach((text, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'card-btn';
-            btn.innerText = text;
-            btn.style.animationDelay = (i * 0.15) + 's';
-            btn.onclick = () => submitCard(text);
-            container.appendChild(btn);
-        });
-    }
+        function getRandomCards() {
+            // Ambil 3 kad sahaja
+            const shuffled = [...allResponses].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 3);
+        }
 
-    function submitCard(text) {
-        document.getElementById('waitScreen').style.display = 'flex';
-        fetch(scriptUrl + '?action=submit&text=' + encodeURIComponent(text), { 
-            method: 'POST', mode: 'no-cors' 
-        }).then(() => console.log("Sent")).catch(e => console.error(e));
-    }
+        function renderHand() {
+            const container = document.getElementById('hand');
+            container.innerHTML = ''; 
+            const myCards = getRandomCards();
+            
+            myCards.forEach((text, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'card-btn';
+                btn.innerText = text;
+                btn.style.animationDelay = (i * 0.15) + 's';
+                btn.onclick = () => submitCard(text);
+                container.appendChild(btn);
+            });
+        }
 
-    window.onerror = function(msg) {
-        document.getElementById('error-msg').style.display = 'block';
-        document.getElementById('error-msg').innerText = "Ralat: " + msg;
-    };
+        function submitCard(text) {
+            document.getElementById('waitScreen').style.display = 'flex';
+            fetch(scriptUrl + '?action=submit&text=' + encodeURIComponent(text), { 
+                method: 'POST', mode: 'no-cors' 
+            }).then(() => console.log("Sent")).catch(e => console.error(e));
+        }
 
-    renderHand();
-</script>
+        window.onerror = function(msg) {
+            document.getElementById('error-msg').style.display = 'block';
+            document.getElementById('error-msg').innerText = "Ralat: " + msg;
+        };
+
+        renderHand();
+    </script>
 </body>
 </html>
